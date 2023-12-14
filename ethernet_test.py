@@ -89,7 +89,8 @@ def handle_packet(pkt):
             print("Received packet:")
             hex_data = hexdump(pkt, dump=True)  # 获取十六进制表示的数据包
             # 保存数据包到文本文件
-            with open("/home/caiyakun3070/01-FW/00-my_code/00-python/testuse/packets.txt", "a") as file:   #need check the path
+            # with open("/home/caiyakun3070/01-FW/00-my_code/00-python/testuse/eth_packets.txt", "a") as file:   #need check the path
+            with open("eth_packets.txt", "a") as file: #packets.txt 文件将will被创建在current目录下
                 file.write(hex_data)
                 file.write("\n\n")
                 print("write done!")    

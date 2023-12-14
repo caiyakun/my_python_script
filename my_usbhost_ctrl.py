@@ -73,7 +73,7 @@ endpoint_out_address = ep_out.bEndpointAddress
 
 
 # clear content of "output.txt" at the start of python_script runs
-with open("output.txt", "w") as file:
+with open("output.txt", "w") as file: #packets.txt 文件将被创建在current目录下
     file.write('')
 
 
