@@ -1,5 +1,5 @@
+
 # [option_1] send only
-'''
 import time
 from scapy.all import *
 
@@ -22,7 +22,7 @@ pkt.type = 0x1234 #0x2222
 # 构建负载内容 (Test firmware中检查收到的data是否符合发送的)
 #ETH_HEADER_LEN = 14
 payload = b""
-for i in range(1024 - 14): # 1024 -14
+for i in range(1490 - 14): # 1024 -14
     payload += struct.pack("B", i & 0xff) # B represent unsigned char
     # payload += struct.pack("B", 0x5a) # B represent unsigned char
 # 将负载内容添加到数据包中
@@ -32,27 +32,35 @@ while True:
     sendp(pkt, iface="enp1s0")    #sendp(pkt, iface="以太网")  
     time.sleep(1)
 
+
+
 '''
-
-
 # [option_2] send + receive
-'''
+
 import time
 from scapy.all import *
 
 # 定义接收数据包的处理函数
 def handle_packet(pkt):
     if pkt.haslayer(Ether):
-        if pkt[Ether].dst == "a4:bb:6d:b0:b8:14" or pkt[Ether].dst == "ff:ff:ff:ff:ff:ff":
+        #if pkt[Ether].dst == "a4:bb:6d:b0:b8:14" or pkt[Ether].dst == "ff:ff:ff:ff:ff:ff":
+        #if pkt[Ether].dst == "a4:bb:6d:b0:b8:14":  
+        if pkt[Ether].dst == "a4:bb:6d:b0:b8:14" and pkt[Ether].src == "c4:dd:57:5f:2b:d3":   #指定目的mac和源mac地址
             print("Received packet:")
-            pkt.show()
+            hex_data = hexdump(pkt, dump=True)  # 获取十六进制表示的数据包
             # 保存数据包到文本文件
-            with open("/home/caiyakun3070/01-FW/00-my_code/00-python/testuse/packets.txt", "a") as file:
-                file.write(str(pkt))
+            # with open("/home/caiyakun3070/01-FW/00-my_code/00-python/testuse/eth_packets.txt", "a") as file:   #need check the path
+            with open("eth_packets.txt", "a") as file: #packets.txt 文件将will被创建在current目录下
+                file.write(hex_data)
                 file.write("\n\n")
+                print("write done!")    
 
 # 创建接收线程
 sniff_thread = threading.Thread(target=sniff, kwargs={"prn": handle_packet, "iface": "enp1s0", "filter": "ether dst a4:bb:6d:b0:b8:14 or ether dst ff:ff:ff:ff:ff:ff"})
+
+# clear content of "output.txt" at the start of python_script runs
+with open("eth_packets.txt", "w") as file: #packets.txt 文件将被创建在current目录下
+    file.write('')
 
 # 启动接收线程
 sniff_thread.start()
@@ -65,8 +73,9 @@ pkt.type = 0x1234 # 自定义Type
 
 # 构建负载内容
 payload = b""
-for i in range(1024 - 14):
-    payload += struct.pack("B", i & 0xff)
+for i in range(64 - 14):
+    # payload += struct.pack("B", i & 0xff)
+    payload += struct.pack("B", i & 0x07)
 
 # 将负载内容添加到数据包中
 pkt = pkt / payload
@@ -74,9 +83,10 @@ pkt = pkt / payload
 # 发送数据包
 while True:
     sendp(pkt, iface="enp1s0")
-    time.sleep(1)
+    time.sleep(3)
 '''
 
+'''
 # [option_3] receive only
 import time
 from scapy.all import *
@@ -104,3 +114,4 @@ sniff_thread.start()
 # 让程序持续运行，以便接收数据包
 while True:
     time.sleep(1)
+'''
